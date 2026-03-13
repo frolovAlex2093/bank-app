@@ -9,10 +9,21 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: update # Для разработки. В продакшене лучше Liquibase/Flyway
+      ddl-auto: update
     properties:
       hibernate:
         default_schema: accounts
+  flyway:
+    enabled: true
+    schemas: accounts
+    default-schema: accounts
+    create-schemas: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/bank-realm
+          jwk-set-uri: http://localhost:9090/realms/bank-realm/protocol/openid-connect/certs
 
 eureka:
   client:

@@ -25,6 +25,7 @@
         <module>config-server</module>
         <module>discovery-server</module>
         <module>bank-front-ui</module>
+        <module>gateway-service</module>
         <module>accounts-service</module>
     </modules>
 
