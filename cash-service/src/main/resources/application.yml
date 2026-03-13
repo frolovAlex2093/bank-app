@@ -1,15 +1,27 @@
+server:
+  port: 8082
+
 spring:
+  application:
+    name: cash-service
   security:
     oauth2:
       client:
         registration:
           cash-service-client:
             client-id: cash-service
-            client-secret: secret
+            client-secret: ${CASH_CLIENT_SECRET:secret}
             authorization-grant-type: client_credentials
             scope: internal_api
         provider:
           keycloak:
             issuer-uri: http://localhost:9090/realms/bank-realm
-  application:
-    name: cash-service
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/bank-realm
+          jwk-set-uri: http://localhost:9090/realms/bank-realm/protocol/openid-connect/certs
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
