@@ -27,6 +27,9 @@
         <module>bank-front-ui</module>
         <module>gateway-service</module>
         <module>accounts-service</module>
+        <module>cash-service</module>
+        <module>transfer-service</module>
+        <module>notifications-service</module>
     </modules>
 
     <dependencyManagement>
