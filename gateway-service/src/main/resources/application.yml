@@ -10,7 +10,7 @@ spring:
         registration:
           keycloak:
             client-id: bank-front-client
-            client-secret: YOUR_SECRET_FROM_KEYCLOAK
+            client-secret: ${KEYCLOAK_CLIENT_SECRET:secret}
             scope: openid, profile, read, write
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
@@ -19,18 +19,25 @@ spring:
             issuer-uri: http://localhost:9090/realms/bank-realm
   cloud:
     gateway:
-      default-filters:
-        - TokenRelay
-      routes:
-        - id: accounts-route
-          uri: lb://accounts-service
-          predicates:
-            - Path=/api/accounts/**
-        - id: cash-route
-          uri: lb://cash-service
-          predicates:
-            - Path=/api/cash/**
-
+      server:
+        webmvc:
+          routes:
+            - id: accounts-route
+              uri: lb://accounts-service
+              predicates:
+                - Path=/api/accounts/**
+            - id: cash-route
+              uri: lb://cash-service
+              predicates:
+                - Path=/api/cash/**
+            - id: transfer-route
+              uri: lb://transfer-service
+              predicates:
+                - Path=/api/transfer/**
+            - id: notifications-route
+              uri: lb://notifications-service
+              predicates:
+                - Path=/api/notifications/**
 
 
 eureka:
