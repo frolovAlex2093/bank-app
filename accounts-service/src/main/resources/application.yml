@@ -1,5 +1,6 @@
 server:
   port: 8081
+
 spring:
   application:
     name: accounts-service
@@ -9,7 +10,7 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         default_schema: accounts
@@ -20,6 +21,16 @@ spring:
     create-schemas: true
   security:
     oauth2:
+      client:
+        registration:
+          accounts-service-client:
+            client-id: accounts-service
+            client-secret: ${ACCOUNTS_CLIENT_SECRET:secret}
+            authorization-grant-type: client_credentials
+            scope: internal_api
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:9090/realms/bank-realm
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9090/realms/bank-realm
