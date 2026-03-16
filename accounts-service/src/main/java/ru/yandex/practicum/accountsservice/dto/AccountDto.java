@@ -1,4 +1,4 @@
-package ru.yandex.practicum.mybankfront.controller.dto;
+package ru.yandex.practicum.accountsservice.dto;
 
 public record AccountDto(String login, String name) {
 }

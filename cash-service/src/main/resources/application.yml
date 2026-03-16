@@ -13,15 +13,6 @@ spring:
             client-secret: ${CASH_CLIENT_SECRET:secret}
             authorization-grant-type: client_credentials
             scope: internal_api
-        provider:
-          keycloak:
-            issuer-uri: http://localhost:9090/realms/bank-realm
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:9090/realms/bank-realm
-          jwk-set-uri: http://localhost:9090/realms/bank-realm/protocol/openid-connect/certs
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+  config:
+    import: "optional:configserver:http://localhost:8888"

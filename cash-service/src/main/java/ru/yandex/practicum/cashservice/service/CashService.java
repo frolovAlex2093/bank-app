@@ -1,6 +1,7 @@
 package ru.yandex.practicum.cashservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import ru.yandex.practicum.cashservice.dto.NotificationRequest;
@@ -19,11 +20,11 @@ public class CashService {
         var response = restClient.patch()
                 .uri("http://accounts-service/api/accounts/{login}/balance?amount={amount}", login, delta)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, resp) -> {
+                    throw new IllegalStateException("Недостаточно средств");
+                })
                 .toBodilessEntity();
 
-        if (response.getStatusCode().isError()) {
-            throw new IllegalStateException("Недостаточно средств");
-        }
 
         String message = action.equals("PUT")
                 ? "Пополнение счёта на сумму " + amount + " руб."

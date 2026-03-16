@@ -14,11 +14,6 @@ spring:
             scope: openid, profile, read, write
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-        provider:
-          keycloak:
-            issuer-uri: http://localhost:9090/realms/bank-realm
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+  config:
+    import: "optional:configserver:http://localhost:8888"

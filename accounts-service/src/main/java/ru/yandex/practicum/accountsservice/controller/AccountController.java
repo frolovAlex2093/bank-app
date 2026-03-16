@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.accountsservice.dto.AccountDto;
 import ru.yandex.practicum.accountsservice.entity.Account;
 import ru.yandex.practicum.accountsservice.repository.AccountRepository;
-import ru.yandex.practicum.mybankfront.controller.dto.AccountDto;
 
 import java.math.BigDecimal;
 import java.util.List;

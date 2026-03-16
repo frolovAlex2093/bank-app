@@ -1,7 +1,6 @@
 package ru.yandex.practicum.mybankfront.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -12,12 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
-import ru.yandex.practicum.accountsservice.entity.Account;
-import ru.yandex.practicum.mybankfront.controller.dto.AccountDto;
 import ru.yandex.practicum.mybankfront.controller.dto.AccountResponseDto;
 import ru.yandex.practicum.mybankfront.controller.dto.CashAction;
 import ru.yandex.practicum.mybankfront.controller.dto.UpdateAccountRequest;
-import ru.yandex.practicum.mybankfront.controller.stub.AccountStub;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -79,7 +75,7 @@ public class MainController {
                 .retrieve()
                 .body(AccountResponseDto.class);
 
-        List<AccountDto> otherAccounts = restClient.get()
+        List<AccountResponseDto> otherAccounts = restClient.get()
                 .uri("/api/accounts/list")
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
@@ -117,7 +113,7 @@ public class MainController {
                     .header("Authorization", "Bearer " + token)
                     .retrieve()
                     .body(AccountResponseDto.class);
-            List<AccountDto> otherAccounts = restClient.get()
+            List<AccountResponseDto> otherAccounts = restClient.get()
                     .uri("/api/accounts/list")
                     .header("Authorization", "Bearer " + token)
                     .retrieve()
@@ -138,7 +134,7 @@ public class MainController {
                 .retrieve()
                 .body(AccountResponseDto.class);
 
-        List<AccountDto> otherAccounts = restClient.get()
+        List<AccountResponseDto> otherAccounts = restClient.get()
                 .uri("/api/accounts/list")
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
@@ -233,7 +229,7 @@ public class MainController {
                 .retrieve()
                 .body(AccountResponseDto.class);
 
-        List<AccountDto> otherAccounts = restClient.get()
+        List<AccountResponseDto> otherAccounts = restClient.get()
                 .uri("/api/accounts/list")
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
@@ -244,7 +240,7 @@ public class MainController {
     }
 
     private void fillModel(Model model, AccountResponseDto account,
-                           List<AccountDto> accounts, List<String> errors, String info) {
+                           List<AccountResponseDto> accounts, List<String> errors, String info) {
         model.addAttribute("name", account.firstName() + " " + account.lastName());
         model.addAttribute("birthdate", account.birthDate().format(DateTimeFormatter.ISO_DATE));
         model.addAttribute("sum", account.balance());

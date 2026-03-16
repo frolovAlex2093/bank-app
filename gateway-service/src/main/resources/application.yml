@@ -17,30 +17,6 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://localhost:9090/realms/bank-realm
-  cloud:
-    gateway:
-      server:
-        webmvc:
-          routes:
-            - id: accounts-route
-              uri: lb://accounts-service
-              predicates:
-                - Path=/api/accounts/**
-            - id: cash-route
-              uri: lb://cash-service
-              predicates:
-                - Path=/api/cash/**
-            - id: transfer-route
-              uri: lb://transfer-service
-              predicates:
-                - Path=/api/transfer/**
-            - id: notifications-route
-              uri: lb://notifications-service
-              predicates:
-                - Path=/api/notifications/**
+  config:
+    import: "optional:configserver:http://localhost:8888"
 
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
