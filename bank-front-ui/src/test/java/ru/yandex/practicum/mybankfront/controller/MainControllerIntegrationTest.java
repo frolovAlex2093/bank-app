@@ -43,7 +43,6 @@ class MainControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    // Заменяем реальный RestClient на мок
     @MockitoBean
     private RestClient restClient;
 

@@ -12,12 +12,10 @@ spring:
             redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
         provider:
           keycloak:
-            # issuer-uri не указываем – вместо этого задаём все endpoint'ы явно
             authorization-uri: http://localhost:9090/realms/bank-realm/protocol/openid-connect/auth
             token-uri: http://localhost:9090/realms/bank-realm/protocol/openid-connect/token
             jwk-set-uri: http://localhost:9090/realms/bank-realm/protocol/openid-connect/certs
-            user-name-attribute: preferred_username   # если используется
-  # Остальные настройки для тестов (например, отключение Eureka)
+            user-name-attribute: preferred_username
   cloud:
     config:
       enabled: false

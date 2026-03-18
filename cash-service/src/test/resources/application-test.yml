@@ -11,12 +11,11 @@ spring:
             provider: keycloak
         provider:
           keycloak:
-            # issuer-uri убираем, чтобы не было попытки соединения
             token-uri: http://localhost:9999/token
             authorization-uri: http://localhost:9999/auth
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9999  # фиктивный, не будет использоваться
+          issuer-uri: http://localhost:9999
 
 
 eureka:

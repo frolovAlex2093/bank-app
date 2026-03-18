@@ -33,7 +33,6 @@ class TransferControllerIntegrationTest {
     @MockitoBean
     private JwtDecoder jwtDecoder;
 
-    // Моки для OAuth2-клиента, чтобы избежать реальной инициализации
     @MockitoBean
     private ClientRegistrationRepository clientRegistrationRepository;
 

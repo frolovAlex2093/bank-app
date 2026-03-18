@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)  // разрешаем неиспользуемые стабы
+@MockitoSettings(strictness = Strictness.LENIENT)
 class TransferServiceTest {
 
     @MockitoBean
@@ -61,13 +61,11 @@ class TransferServiceTest {
         requestBodySpec = mock(RestClient.RequestBodySpec.class);
         responseSpec = mock(RestClient.ResponseSpec.class);
 
-        // Настройка PATCH
         when(restClient.patch()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString(), any(), any())).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
 
-        // Настройка POST
         when(restClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
         when(requestBodySpec.body(any(NotificationRequest.class))).thenReturn(requestBodySpec);
@@ -104,7 +102,6 @@ class TransferServiceTest {
     void transfer_orderOfCalls() {
         transferService.transfer("ivan_ivanov", "petr_petrov", 300);
 
-        // Захватываем аргументы всех вызовов requestBodyUriSpec.uri(...)
         ArgumentCaptor<String> uriCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Object> arg1Captor = ArgumentCaptor.forClass(Object.class);
         ArgumentCaptor<Object> arg2Captor = ArgumentCaptor.forClass(Object.class);
@@ -115,17 +112,14 @@ class TransferServiceTest {
         List<Object> args1 = arg1Captor.getAllValues();
         List<Object> args2 = arg2Captor.getAllValues();
 
-        // Проверяем первый вызов (списание)
         assertThat(uris.get(0)).isEqualTo("http://accounts-service/api/accounts/{login}/balance?amount={amount}");
         assertThat(args1.get(0)).isEqualTo("ivan_ivanov");
         assertThat(args2.get(0)).isEqualTo(BigDecimal.valueOf(-300));
 
-        // Проверяем второй вызов (зачисление)
         assertThat(uris.get(1)).isEqualTo("http://accounts-service/api/accounts/{login}/balance?amount={amount}");
         assertThat(args1.get(1)).isEqualTo("petr_petrov");
         assertThat(args2.get(1)).isEqualTo(BigDecimal.valueOf(300));
 
-        // Проверяем, что было два уведомления (POST)
         verify(restClient, times(2)).post();
     }
 
@@ -140,7 +134,6 @@ class TransferServiceTest {
     @Test
     @DisplayName("transfer — при недостатке средств бросает исключение")
     void transfer_insufficientFunds_throws() {
-        // Переопределяем только поведение toBodilessEntity для первого вызова (списание)
         when(responseSpec.toBodilessEntity())
                 .thenReturn(ResponseEntity.badRequest().build());
 
@@ -149,7 +142,7 @@ class TransferServiceTest {
         ).isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Недостаточно средств");
 
-        verify(restClient, times(1)).patch(); // только списание
+        verify(restClient, times(1)).patch();
         verify(restClient, never()).post();
     }
 
@@ -163,7 +156,7 @@ class TransferServiceTest {
                 transferService.transfer("ivan_ivanov", "petr_petrov", 9999)
         ).isInstanceOf(IllegalStateException.class);
 
-        verify(restClient, times(1)).patch(); // только списание
+        verify(restClient, times(1)).patch();
         verify(restClient, never()).post();
     }
 }

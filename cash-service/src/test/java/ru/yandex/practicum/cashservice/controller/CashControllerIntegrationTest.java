@@ -31,7 +31,7 @@ class CashControllerIntegrationTest {
     private CashService cashService;
 
     @MockitoBean
-    private JwtDecoder jwtDecoder;  // мок, чтобы не было попыток реального соединения
+    private JwtDecoder jwtDecoder;
 
     @Test
     @DisplayName("POST /api/cash?action=PUT — 200 для авторизованного пользователя")

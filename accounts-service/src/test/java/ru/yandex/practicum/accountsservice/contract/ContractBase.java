@@ -51,7 +51,6 @@ public abstract class ContractBase {
     void setUp() {
         repository.deleteAll();
 
-        // 1. Тестовые данные
         Account account = new Account();
         account.setLogin("ivan_ivanov");
         account.setFirstName("Иван");
@@ -60,7 +59,7 @@ public abstract class ContractBase {
         account.setBalance(BigDecimal.valueOf(1000));
         repository.save(account);
 
-        // 2. Мок JwtDecoder – любой токен превращается в нужного пользователя
+
         Jwt jwt = Jwt.withTokenValue("fake-token")
                 .header("alg", "none")
                 .subject("ivan_ivanov")
@@ -69,16 +68,13 @@ public abstract class ContractBase {
                 .build();
         when(jwtDecoder.decode(anyString())).thenReturn(jwt);
 
-        // 3. Создаём MockMvc с Spring Security (как в интеграционных тестах)
         MockMvc mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
 
-        // 4. Регистрируем MockMvc в RestAssuredMockMvc
         RestAssuredMockMvc.mockMvc(mockMvc);
 
-        // 5. Глобальная спецификация: добавляем заголовок Authorization во все запросы
         RestAssuredMockMvc.requestSpecification = given()
                 .header("Authorization", "Bearer fake-token");
     }

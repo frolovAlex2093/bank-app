@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT) // разрешаем лишние стабы, чтобы избежать UnnecessaryStubbingException
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CashServiceTest {
 
     @Mock
@@ -35,7 +35,6 @@ class CashServiceTest {
     @Captor
     private ArgumentCaptor<NotificationRequest> notificationCaptor;
 
-    // Моки для цепочек вызовов
     private RestClient.RequestBodyUriSpec patchUriSpec;
     private RestClient.RequestBodySpec patchBodySpec;
     private RestClient.ResponseSpec patchResponseSpec;
@@ -52,14 +51,12 @@ class CashServiceTest {
         postBodySpec = mock(RestClient.RequestBodySpec.class);
         postResponseSpec = mock(RestClient.ResponseSpec.class);
 
-        // Настройка PATCH
         when(restClient.patch()).thenReturn(patchUriSpec);
         when(patchUriSpec.uri(anyString(), any(), any())).thenReturn(patchBodySpec);
         when(patchBodySpec.retrieve()).thenReturn(patchResponseSpec);
         when(patchResponseSpec.onStatus(any(), any())).thenReturn(patchResponseSpec);
         when(patchResponseSpec.toBodilessEntity()).thenReturn(mock(ResponseEntity.class));
 
-        // Настройка POST (для уведомлений)
         when(restClient.post()).thenReturn(postUriSpec);
         when(postUriSpec.uri(anyString())).thenReturn(postBodySpec);
         when(postBodySpec.body(any(NotificationRequest.class))).thenReturn(postBodySpec);
@@ -106,7 +103,6 @@ class CashServiceTest {
     @Test
     @DisplayName("GET — при ошибке Accounts (4xx) бросает исключение, уведомление не отправляется")
     void processCash_accountsError_throwsAndNoNotification() {
-        // Переопределяем только поведение toBodilessEntity для PATCH
         when(patchResponseSpec.toBodilessEntity()).thenThrow(new IllegalStateException("Недостаточно средств"));
 
         assertThatThrownBy(() ->

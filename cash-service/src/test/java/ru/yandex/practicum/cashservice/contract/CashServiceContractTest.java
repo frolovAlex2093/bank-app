@@ -48,7 +48,6 @@ class CashServiceContractTest {
 
     @BeforeEach
     void setUp() {
-        // Настройка мока для OAuth2AuthorizedClientManager, чтобы он возвращал клиента с токеном
         OAuth2AuthorizedClient authorizedClient = mock(OAuth2AuthorizedClient.class);
         OAuth2AccessToken accessToken = mock(OAuth2AccessToken.class);
         when(accessToken.getTokenValue()).thenReturn("test-token");
@@ -75,7 +74,7 @@ class CashServiceContractTest {
                         .uri("http://localhost:8081/api/accounts/ivan_ivanov/balance?amount=-9999")
                         .retrieve()
                         .toBodilessEntity()
-        ).isInstanceOf(Exception.class) // или конкретного исключения, если оно выбрасывается
-                .hasMessageContaining("400");  // уточните сообщение
+        ).isInstanceOf(Exception.class)
+                .hasMessageContaining("400");
     }
 }
