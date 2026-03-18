@@ -24,12 +24,12 @@
     <modules>
         <module>config-server</module>
         <module>discovery-server</module>
-        <module>bank-front-ui</module>
-        <module>gateway-service</module>
         <module>accounts-service</module>
+        <module>notifications-service</module>
         <module>cash-service</module>
         <module>transfer-service</module>
-        <module>notifications-service</module>
+        <module>gateway-service</module>
+        <module>bank-front-ui</module>
     </modules>
 
     <dependencyManagement>
@@ -57,5 +57,17 @@
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-contract-maven-plugin</artifactId>
+                    <version>4.2.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>

@@ -1,0 +1,24 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/bank-realm
+      client:
+        registration:
+          transfer-service-client:
+            provider: keycloak
+            client-id: transfer-service
+            client-secret: test-secret
+            authorization-grant-type: client_credentials
+            scope: internal_api
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:9090/realms/bank-realm
+  main:
+    allow-bean-definition-overriding: true
+
+
+eureka:
+  client:
+    enabled: false
