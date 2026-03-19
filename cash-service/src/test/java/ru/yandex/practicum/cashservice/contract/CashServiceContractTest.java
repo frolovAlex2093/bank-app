@@ -59,7 +59,7 @@ class CashServiceContractTest {
     @DisplayName("Контракт: PATCH /balance с положительной суммой возвращает 200")
     void contract_deposit_returns200() {
         var response = restClient.patch()
-                .uri("http://localhost:8081/api/accounts/ivan_ivanov/balance?amount=500")
+                .uri("http://accounts-service/api/accounts/ivan_ivanov/balance?amount=500")
                 .retrieve()
                 .toBodilessEntity();
 
@@ -71,7 +71,7 @@ class CashServiceContractTest {
     void contract_overdraft_returns400() {
         assertThatThrownBy(() ->
                 restClient.patch()
-                        .uri("http://localhost:8081/api/accounts/ivan_ivanov/balance?amount=-9999")
+                        .uri("http://accounts-service/api/accounts/ivan_ivanov/balance?amount=-9999")
                         .retrieve()
                         .toBodilessEntity()
         ).isInstanceOf(Exception.class)

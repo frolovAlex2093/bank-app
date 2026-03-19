@@ -115,7 +115,7 @@ class AccountControllerTest {
     @Test
     @DisplayName("updateBalance — успешно пополняет баланс")
     void updateBalance_deposit() {
-        when(repository.findByLogin("ivan_ivanov")).thenReturn(Optional.of(ivan));
+        when(repository.findWithLockByLogin("ivan_ivanov")).thenReturn(Optional.of(ivan));
         when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         ResponseEntity<Void> response =
@@ -128,7 +128,7 @@ class AccountControllerTest {
     @Test
     @DisplayName("updateBalance — 400 при недостатке средств")
     void updateBalance_insufficientFunds() {
-        when(repository.findByLogin("ivan_ivanov")).thenReturn(Optional.of(ivan));
+        when(repository.findWithLockByLogin("ivan_ivanov")).thenReturn(Optional.of(ivan));
 
         ResponseEntity<Void> response =
                 controller.updateBalance("ivan_ivanov", BigDecimal.valueOf(-5000));

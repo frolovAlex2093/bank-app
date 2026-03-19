@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -42,15 +43,11 @@ class TransferServiceContractTest {
     @DisplayName("Контракт: списание (отрицательная сумма) — 400 при недостатке")
     void contract_debit_overdraft_returns400() {
         var response = restClient.patch()
-                .uri("http://localhost:8081/api/accounts/ivan_ivanov/balance?amount=-9999")
+                .uri("http://accounts-service/api/accounts/ivan_ivanov/balance?amount=-9999")
                 .header("Authorization", "Bearer test-token")
                 .retrieve()
-                .onStatus(
-                        status -> status.value() == 400,
-                        (req, resp) -> {
-                        }
-                )
-                .toBodilessEntity();
+                .onStatus(status -> status.value() == 400, (req, resp) -> {})
+                .toEntity(Void.class);
 
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
@@ -59,7 +56,7 @@ class TransferServiceContractTest {
     @DisplayName("Контракт: зачисление (положительная сумма) — 200")
     void contract_credit_returns200() {
         var response = restClient.patch()
-                .uri("http://localhost:8081/api/accounts/ivan_ivanov/balance?amount=500")
+                .uri("http://accounts-service/api/accounts/ivan_ivanov/balance?amount=500")
                 .header("Authorization", "Bearer test-token")
                 .retrieve()
                 .toBodilessEntity();

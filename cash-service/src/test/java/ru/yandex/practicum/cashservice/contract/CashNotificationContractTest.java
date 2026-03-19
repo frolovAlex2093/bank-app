@@ -59,7 +59,7 @@ class CashNotificationContractTest {
     @DisplayName("Контракт: POST /api/notifications — валидный запрос возвращает 200")
     void contract_notify_validRequest_returns200() {
         var response = restClient.post()
-                .uri("http://localhost:8084/api/notifications")
+                .uri("http://notifications-service/api/notifications")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new NotificationRequest("ivan_ivanov", "Пополнение счёта на 500 руб."))
                 .retrieve()

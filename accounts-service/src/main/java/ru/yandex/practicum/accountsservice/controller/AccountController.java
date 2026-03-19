@@ -3,6 +3,7 @@ package ru.yandex.practicum.accountsservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.accountsservice.dto.AccountDto;
 import ru.yandex.practicum.accountsservice.entity.Account;
@@ -26,6 +27,7 @@ public class AccountController {
     }
 
     @PutMapping("/me")
+    @Transactional
     public ResponseEntity<Account> updateMyAccount(JwtAuthenticationToken auth, @RequestBody Account updatedAccount) {
         String login = auth.getTokenAttributes().get("preferred_username").toString();
         return repository.findByLogin(login).map(existing -> {
@@ -46,8 +48,9 @@ public class AccountController {
     }
 
     @PatchMapping("/{login}/balance")
+    @Transactional
     public ResponseEntity<Void> updateBalance(@PathVariable String login, @RequestParam BigDecimal amount) {
-        Account account = repository.findByLogin(login).orElseThrow();
+        Account account = repository.findWithLockByLogin(login).orElseThrow();
         account.setBalance(account.getBalance().add(amount));
         if (account.getBalance().compareTo(BigDecimal.ZERO) < 0) {
             return ResponseEntity.badRequest().build();

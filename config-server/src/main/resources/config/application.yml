@@ -14,3 +14,31 @@ spring:
         jwt:
           issuer-uri: http://localhost:9090/realms/bank-realm
           jwk-set-uri: http://localhost:9090/realms/bank-realm/protocol/openid-connect/certs
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      accountsService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+      externalService:
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+  retry:
+    instances:
+      accountsService:
+        maxAttempts: 3
+        waitDuration: 1s
+        retryExceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - java.io.IOException
+      externalService:
+        maxAttempts: 2
+        waitDuration: 500ms

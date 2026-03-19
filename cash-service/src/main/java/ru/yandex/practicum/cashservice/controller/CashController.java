@@ -1,9 +1,11 @@
 package ru.yandex.practicum.cashservice.controller;
 
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.cashservice.service.CashService;
 
@@ -12,13 +14,15 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping("/api/cash")
 @RequiredArgsConstructor
+@Validated
 public class CashController {
 
     private final CashService cashService;
 
     @PostMapping
     public ResponseEntity<Void> processCash(
-            @RequestParam int value,
+            @RequestParam
+            @Positive(message = "Сумма должна быть положительной") int value,
             @RequestParam String action,
             JwtAuthenticationToken auth
     ) {
