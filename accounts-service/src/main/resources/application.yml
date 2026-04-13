@@ -1,0 +1,36 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: accounts-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank_db?currentSchema=accounts
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: accounts
+  flyway:
+    enabled: true
+    schemas: accounts
+    default-schema: accounts
+    create-schemas: true
+  security:
+    oauth2:
+      client:
+        registration:
+          accounts-service-client:
+            client-id: accounts-service
+            client-secret: ${ACCOUNTS_CLIENT_SECRET:secret}
+            authorization-grant-type: client_credentials
+            scope: internal_api
+  config:
+    import: "optional:configserver:http://localhost:8888"
+
+  main:
+    allow-bean-definition-overriding: true
+

@@ -1,0 +1,23 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          cash-service-client:
+            client-id: cash-service
+            client-secret: test-secret
+            authorization-grant-type: client_credentials
+            scope: internal_api
+            provider: keycloak
+        provider:
+          keycloak:
+            token-uri: http://localhost:9999/token
+            authorization-uri: http://localhost:9999/auth
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9999
+
+
+eureka:
+  client:
+    enabled: false
