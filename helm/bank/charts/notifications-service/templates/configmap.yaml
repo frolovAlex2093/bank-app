@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notifications-service-config
+data:
+  OAUTH2_ISSUER_URI: {{ .Values.oauth2.issuerUri | quote }}
+  OAUTH2_JWK_SET_URI: {{ .Values.oauth2.jwkSetUri | quote }}

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bank-front-ui
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: bank-front-ui
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: 8085
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}

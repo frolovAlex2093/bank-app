@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: gateway-service
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: 8080
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
