@@ -4,3 +4,9 @@ server:
 spring:
   application:
     name: notifications-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9090/realms/bank-realm}
+          jwk-set-uri: ${OAUTH2_JWK_SET_URI:http://localhost:9090/realms/bank-realm/protocol/openid-connect/certs}
