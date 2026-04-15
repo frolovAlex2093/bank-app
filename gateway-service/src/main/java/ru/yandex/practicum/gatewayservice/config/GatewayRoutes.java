@@ -1,10 +1,8 @@
 package ru.yandex.practicum.gatewayservice.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.cloud.gateway.server.mvc.filter.TokenRelayFilterFunctions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -16,10 +14,19 @@ import static org.springframework.cloud.gateway.server.mvc.predicate.GatewayRequ
 @Configuration
 public class GatewayRoutes {
 
+    @Value("${services.accounts-url:http://accounts-service:8081}")
+    private String accountsServiceUrl;
+    @Value("${services.cash-url:http://cash-service:8082}")
+    private String cashServiceUrl;
+    @Value("${services.transfer-url:http://transfer-service:8083}")
+    private String transferServiceUrl;
+    @Value("${services.notifications-url:http://notifications-service:8084}")
+    private String notificationsServiceUrl;
+
     @Bean
     public RouterFunction<ServerResponse> accountsRoute() {
         return route("accounts-route")
-                .route(path("/api/accounts/**"), http("lb://accounts-service"))
+                .route(path("/api/accounts/**"), http(accountsServiceUrl))
                 .filter(tokenRelay())
                 .build();
     }
@@ -27,7 +34,7 @@ public class GatewayRoutes {
     @Bean
     public RouterFunction<ServerResponse> cashRoute() {
         return route("cash-route")
-                .route(path("/api/cash/**"), http("lb://cash-service"))
+                .route(path("/api/cash/**"), http(cashServiceUrl))
                 .filter(tokenRelay())
                 .build();
     }
@@ -35,7 +42,7 @@ public class GatewayRoutes {
     @Bean
     public RouterFunction<ServerResponse> transferRoute() {
         return route("transfer-route")
-                .route(path("/api/transfer/**"), http("lb://transfer-service"))
+                .route(path("/api/transfer/**"), http(transferServiceUrl))
                 .filter(tokenRelay())
                 .build();
     }
@@ -43,7 +50,7 @@ public class GatewayRoutes {
     @Bean
     public RouterFunction<ServerResponse> notificationsRoute() {
         return route("notifications-route")
-                .route(path("/api/notifications/**"), http("lb://notifications-service"))
+                .route(path("/api/notifications/**"), http(notificationsServiceUrl))
                 .filter(tokenRelay())
                 .build();
     }

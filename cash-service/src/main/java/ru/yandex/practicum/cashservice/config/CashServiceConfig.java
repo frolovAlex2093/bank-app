@@ -1,6 +1,5 @@
 package ru.yandex.practicum.cashservice.config;
 
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.*;
@@ -29,7 +28,6 @@ public class CashServiceConfig {
     }
 
     @Bean
-    @LoadBalanced
     public RestClient.Builder restClientBuilder() {
         return RestClient.builder();
     }

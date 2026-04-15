@@ -22,8 +22,6 @@
     </properties>
 
     <modules>
-        <module>config-server</module>
-        <module>discovery-server</module>
         <module>accounts-service</module>
         <module>notifications-service</module>
         <module>cash-service</module>
@@ -45,16 +43,10 @@
     </dependencyManagement>
 
     <dependencies>
-
-        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
     </dependencies>
 

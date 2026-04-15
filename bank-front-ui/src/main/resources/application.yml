@@ -15,6 +15,3 @@ spring:
             scope: openid, profile, read, write
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-
-  config:
-    import: "optional:configserver:http://localhost:8888"

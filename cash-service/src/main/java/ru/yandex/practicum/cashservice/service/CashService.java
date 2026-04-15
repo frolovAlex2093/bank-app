@@ -27,7 +27,7 @@ public class CashService {
         log.info("Обработка наличных для {}: {} {}", login, action, amount);
 
         restClient.patch()
-                .uri("http://accounts-service/api/accounts/{login}/balance?amount={amount}", login, delta)
+                .uri("http://accounts-service:8081/api/accounts/{login}/balance?amount={amount}", login, delta)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, resp) -> {
                     throw new IllegalStateException("Недостаточно средств или неверный запрос");
@@ -39,7 +39,7 @@ public class CashService {
                 : "Снятие со счёта на сумму " + amount + " руб.";
 
         restClient.post()
-                .uri("http://notifications-service/api/notifications")
+                .uri("http://notifications-service:8084/api/notifications")
                 .body(new NotificationRequest(login, message))
                 .retrieve()
                 .toBodilessEntity();

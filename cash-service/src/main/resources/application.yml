@@ -13,6 +13,3 @@ spring:
             client-secret: ${CASH_CLIENT_SECRET:secret}
             authorization-grant-type: client_credentials
             scope: internal_api
-
-  config:
-    import: "optional:configserver:http://localhost:8888"

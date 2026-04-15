@@ -27,7 +27,7 @@ public class TransferService {
         log.info("Начало перевода: {} -> {} (сумма: {})", fromLogin, toLogin, amount);
 
         restClient.patch()
-                .uri("http://accounts-service/api/accounts/{login}/balance?amount={amount}",
+                .uri("http://accounts-service:8081/api/accounts/{login}/balance?amount={amount}",
                         fromLogin, amountBD.negate())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, resp) -> {
@@ -37,7 +37,7 @@ public class TransferService {
 
         try {
             restClient.patch()
-                    .uri("http://accounts-service/api/accounts/{login}/balance?amount={amount}",
+                    .uri("http://accounts-service:8081/api/accounts/{login}/balance?amount={amount}",
                             toLogin, amountBD)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, (req, resp) -> {
@@ -57,7 +57,7 @@ public class TransferService {
     private void compensateDebit(String login, BigDecimal amount) {
         try {
             restClient.patch()
-                    .uri("http://accounts-service/api/accounts/{login}/balance?amount={amount}",
+                    .uri("http://accounts-service:8081/api/accounts/{login}/balance?amount={amount}",
                             login, amount)
                     .retrieve()
                     .toBodilessEntity();
@@ -68,13 +68,13 @@ public class TransferService {
 
     private void sendNotifications(String fromLogin, String toLogin, int amount) {
         restClient.post()
-                .uri("http://notifications-service/api/notifications")
+                .uri("http://notifications-service:8084/api/notifications")
                 .body(new NotificationRequest(fromLogin, "Перевод " + amount + " руб. пользователю " + toLogin))
                 .retrieve()
                 .toBodilessEntity();
 
         restClient.post()
-                .uri("http://notifications-service/api/notifications")
+                .uri("http://notifications-service:8084/api/notifications")
                 .body(new NotificationRequest(toLogin, "Получен перевод " + amount + " руб. от " + fromLogin))
                 .retrieve()
                 .toBodilessEntity();

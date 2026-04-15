@@ -4,6 +4,3 @@ server:
 spring:
   application:
     name: notifications-service
-
-  config:
-    import: "optional:configserver:http://localhost:8888"

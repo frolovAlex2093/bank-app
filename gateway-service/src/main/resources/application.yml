@@ -17,6 +17,4 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://localhost:9090/realms/bank-realm
-  config:
-    import: "optional:configserver:http://localhost:8888"
 
