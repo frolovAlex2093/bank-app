@@ -54,6 +54,7 @@ helm/bank
 - Docker
 - Kubernetes (Minikube / Kind / Rancher Desktop / Colima)
 - Helm 
+- Jenkins
 
 ## Сборка
 
@@ -121,3 +122,37 @@ helm test bank -n bank-dev
 ```
 
 `helm test` запускает pod-хук, который проверяет DNS-резолв микросервисов в кластере.
+
+## CI/CD (Jenkins Pipeline)
+
+### Схема работы пайплайна
+
+1.  **Checkout**: Получение актуального кода из репозитория.
+2.  **Build**: Сборка всех микросервисов с помощью Maven (`clean package`). JAR-файлы архивируются в Jenkins.
+3.  **Unit & Integration Tests**: Запуск тестов (`mvn verify`). Результаты тестов (JUnit XML) публикуются в отчете сборки.
+4.  **Docker Build**:
+    *   Пайплайн подключается к Docker-демону внутри Minikube (`minikube docker-env`).
+    *   Собираются образы для всех 6 сервисов.
+    *   Образам присваивается тег, равный номеру сборки Jenkins (`${BUILD_NUMBER}`), и тег `latest`.
+5.  **Helm Lint & Dependency Update**: Проверка корректности Helm-манифестов и загрузка зависимостей (Postgres, Keycloak).
+6.  **Deploy**: Обновление всего стека через зонтичный чарт.
+    *   Используется команда `helm upgrade --install`.
+    *   Флаг `--atomic` обеспечивает автоматический откат при ошибке.
+    *   Флаг `--wait` заставляет Jenkins ждать готовности всех подов.
+7.  **Helm Test**: Запуск встроенных тестов чарта для проверки Service Discovery (DNS-резолвинг между сервисами).
+
+### Настройка Jenkins
+
+Для работы пайплайна в Jenkins должны быть установлены следующие плагины:
+*   `Docker Pipeline`
+*   `Kubernetes CLI`
+*   `Pipeline: Stage View`
+
+**Необходимые Credentials:**
+*   `k8s-config`: Файл секретов для доступа к кластеру Kubernetes.
+
+### Запуск пайплайна
+
+1.  Создайте в Jenkins новый проект типа **Pipeline**.
+2.  В разделе **Pipeline script from SCM** укажите путь к Git-репозиторию и `Jenkinsfile`.
+3.  Нажмите **Build Now**.
