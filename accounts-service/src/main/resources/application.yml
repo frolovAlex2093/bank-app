@@ -28,8 +28,13 @@ spring:
             client-secret: ${ACCOUNTS_CLIENT_SECRET:secret}
             authorization-grant-type: client_credentials
             scope: internal_api
-  config:
-    import: "optional:configserver:http://localhost:8888"
+      provider:
+        keycloak:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9090/realms/bank-realm}
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9090/realms/bank-realm}
+          jwk-set-uri: ${OAUTH2_JWK_SET_URI:http://localhost:9090/realms/bank-realm/protocol/openid-connect/certs}
 
   main:
     allow-bean-definition-overriding: true

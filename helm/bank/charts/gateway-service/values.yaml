@@ -1,0 +1,23 @@
+replicaCount: 1
+image:
+  repository: gateway-service
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: NodePort
+  port: 8080
+  nodePort: 30080
+ingress:
+  enabled: false
+  className: ""
+  host: bank.local
+oauth2:
+  issuerUri: "http://keycloak:8080/realms/bank-realm"
+  jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+oauth2Secrets:
+  frontClientSecret: "change-me-front-secret"
+services:
+  accountsUrl: "http://accounts-service:8081"
+  cashUrl: "http://cash-service:8082"
+  transferUrl: "http://transfer-service:8083"
+  notificationsUrl: "http://notifications-service:8084"

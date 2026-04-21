@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: accounts-service-config
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/{{ .Values.postgres.database }}?currentSchema=accounts"
+  SPRING_DATASOURCE_USERNAME: {{ .Values.postgres.user | quote }}
+  OAUTH2_ISSUER_URI: {{ .Values.oauth2.issuerUri | quote }}
+  OAUTH2_JWK_SET_URI: {{ .Values.oauth2.jwkSetUri | quote }}

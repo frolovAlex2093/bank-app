@@ -1,0 +1,10 @@
+replicaCount: 1
+image:
+  repository: notifications-service
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  port: 8084
+oauth2:
+  issuerUri: "http://keycloak:8080/realms/bank-realm"
+  jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"

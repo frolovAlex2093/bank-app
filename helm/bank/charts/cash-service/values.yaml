@@ -1,0 +1,12 @@
+replicaCount: 1
+image:
+  repository: cash-service
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  port: 8082
+oauth2:
+  issuerUri: "http://keycloak:8080/realms/bank-realm"
+  jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+oauth2Secrets:
+  cashClientSecret: "change-me-cash-secret"

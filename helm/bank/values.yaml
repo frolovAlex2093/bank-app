@@ -1,0 +1,74 @@
+global:
+  oauth2:
+    issuerUri: "http://keycloak:8080/realms/bank-realm"
+    jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+  oauth2Secrets:
+    frontClientSecret: "change-me-front-secret"
+    accountsClientSecret: "change-me-accounts-secret"
+    cashClientSecret: "change-me-cash-secret"
+    transferClientSecret: "change-me-transfer-secret"
+  postgres:
+    user: "user"
+    password: "password"
+    database: "bank_db"
+
+postgres:
+  enabled: true
+  postgres:
+    user: "user"
+    password: "password"
+    database: "bank_db"
+
+keycloak:
+  enabled: true
+
+bank-front-ui:
+  enabled: true
+  oauth2:
+    issuerUri: "http://keycloak:8080/realms/bank-realm"
+  oauth2Secrets:
+    frontClientSecret: "change-me-front-secret"
+  gateway:
+    baseUrl: "http://gateway-service:8080"
+
+accounts-service:
+  postgres:
+    user: "user"
+    password: "password"
+    database: "bank_db"
+  oauth2:
+    issuerUri: "http://keycloak:8080/realms/bank-realm"
+    jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+  oauth2Secrets:
+    accountsClientSecret: "change-me-accounts-secret"
+
+cash-service:
+  oauth2:
+    issuerUri: "http://keycloak:8080/realms/bank-realm"
+    jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+  oauth2Secrets:
+    cashClientSecret: "change-me-cash-secret"
+
+transfer-service:
+  oauth2:
+    issuerUri: "http://keycloak:8080/realms/bank-realm"
+    jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+  oauth2Secrets:
+    transferClientSecret: "change-me-transfer-secret"
+
+notifications-service:
+  oauth2:
+    issuerUri: "http://keycloak:8080/realms/bank-realm"
+    jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+
+gateway-service:
+  oauth2:
+    issuerUri: "http://keycloak:8080/realms/bank-realm"
+    jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+  oauth2Secrets:
+    frontClientSecret: "change-me-front-secret"
+  services:
+    accountsUrl: "http://accounts-service:8081"
+    cashUrl: "http://cash-service:8082"
+    transferUrl: "http://transfer-service:8083"
+    notificationsUrl: "http://notifications-service:8084"

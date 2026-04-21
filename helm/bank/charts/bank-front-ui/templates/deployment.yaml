@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-front-ui
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: bank-front-ui
+  template:
+    metadata:
+      labels:
+        app: bank-front-ui
+    spec:
+      containers:
+        - name: bank-front-ui
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - configMapRef:
+                name: bank-front-ui-config
+            - secretRef:
+                name: bank-front-ui-secret

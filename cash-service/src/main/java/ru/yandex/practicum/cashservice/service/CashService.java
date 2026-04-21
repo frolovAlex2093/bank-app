@@ -4,6 +4,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -19,6 +20,11 @@ public class CashService {
     private final RestClient restClient;
     private static final String EXTERNAL_SERVICE = "externalService";
 
+    @Value("${services.accounts-url:http://accounts-service:8081}")
+    private String accountsServiceUrl;
+    @Value("${services.notifications-url:http://notifications-service:8084}")
+    private String notificationsServiceUrl;
+
     @CircuitBreaker(name = EXTERNAL_SERVICE, fallbackMethod = "processCashFallback")
     @Retry(name = EXTERNAL_SERVICE)
     public void processCash(String login, BigDecimal amount, String action) {
@@ -27,7 +33,7 @@ public class CashService {
         log.info("Обработка наличных для {}: {} {}", login, action, amount);
 
         restClient.patch()
-                .uri("http://accounts-service/api/accounts/{login}/balance?amount={amount}", login, delta)
+                .uri(accountsServiceUrl + "/api/accounts/{login}/balance?amount={amount}", login, delta)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, resp) -> {
                     throw new IllegalStateException("Недостаточно средств или неверный запрос");
@@ -39,7 +45,7 @@ public class CashService {
                 : "Снятие со счёта на сумму " + amount + " руб.";
 
         restClient.post()
-                .uri("http://notifications-service/api/notifications")
+                .uri(notificationsServiceUrl + "/api/notifications")
                 .body(new NotificationRequest(login, message))
                 .retrieve()
                 .toBodilessEntity();

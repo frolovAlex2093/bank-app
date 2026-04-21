@@ -1,0 +1,15 @@
+replicaCount: 1
+image:
+  repository: bank-front-ui
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: NodePort
+  port: 8085
+  nodePort: 30085
+oauth2:
+  issuerUri: "http://keycloak:8080/realms/bank-realm"
+oauth2Secrets:
+  frontClientSecret: "change-me-front-secret"
+gateway:
+  baseUrl: "http://gateway-service:8080"

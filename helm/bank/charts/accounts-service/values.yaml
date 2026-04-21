@@ -1,0 +1,16 @@
+replicaCount: 1
+image:
+  repository: accounts-service
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  port: 8081
+postgres:
+  user: user
+  password: password
+  database: bank_db
+oauth2:
+  issuerUri: "http://keycloak:8080/realms/bank-realm"
+  jwkSetUri: "http://keycloak:8080/realms/bank-realm/protocol/openid-connect/certs"
+oauth2Secrets:
+  accountsClientSecret: "change-me-accounts-secret"
