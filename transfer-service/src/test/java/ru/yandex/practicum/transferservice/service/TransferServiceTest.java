@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
+import ru.yandex.practicum.transferservice.kafka.NotificationProducer;
 
 import java.math.BigDecimal;
 
@@ -25,6 +26,9 @@ class TransferServiceTest {
     @Mock
     private RestClient restClient;
 
+    @Mock
+    private NotificationProducer notificationProducer;
+
     @InjectMocks
     private TransferService transferService;
 
@@ -37,7 +41,6 @@ class TransferServiceTest {
         responseSpec = mock(RestClient.ResponseSpec.class);
 
         when(restClient.patch()).thenReturn(requestSpec);
-        when(restClient.post()).thenReturn(requestSpec);
         when(requestSpec.uri(anyString())).thenReturn(requestSpec);
         when(requestSpec.uri(anyString(), any(Object[].class))).thenReturn(requestSpec);
         when(requestSpec.uri(anyString(), any(), any())).thenReturn(requestSpec);
@@ -59,12 +62,13 @@ class TransferServiceTest {
         assertThatThrownBy(() ->
                 transferService.transfer("ivan_ivanov", "petr_petrov", 9999)
         ).isInstanceOf(IllegalStateException.class);
+
+        verify(notificationProducer, never()).sendNotification(any());
     }
 
     @Test
     @DisplayName("transfer — Saga: возврат средств при ошибке зачисления")
     void transfer_saga_rollback() {
-
         when(responseSpec.onStatus(any(), any()))
                 .thenReturn(responseSpec)
                 .thenAnswer(inv -> {
@@ -77,8 +81,11 @@ class TransferServiceTest {
         ).isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Перевод не удался");
 
+        // Проверяем вызов компенсации
         verify(requestSpec).uri(eq("http://accounts-service/api/accounts/{login}/balance?amount={amount}"),
                 eq("ivan_ivanov"),
                 eq(BigDecimal.valueOf(300)));
+
+        verify(notificationProducer, never()).sendNotification(any());
     }
 }
