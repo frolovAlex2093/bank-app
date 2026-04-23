@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import ru.yandex.practicum.cashservice.dto.NotificationRequest;
+import ru.yandex.practicum.cashservice.dto.NotificationMessage;
+import ru.yandex.practicum.cashservice.kafka.NotificationProducer;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -18,12 +20,12 @@ import java.math.BigDecimal;
 public class CashService {
 
     private final RestClient restClient;
+    private final NotificationProducer notificationProducer;
+
     private static final String EXTERNAL_SERVICE = "externalService";
 
     @Value("${services.accounts-url:http://accounts-service:8081}")
     private String accountsServiceUrl;
-    @Value("${services.notifications-url:http://notifications-service:8084}")
-    private String notificationsServiceUrl;
 
     @CircuitBreaker(name = EXTERNAL_SERVICE, fallbackMethod = "processCashFallback")
     @Retry(name = EXTERNAL_SERVICE)
@@ -44,11 +46,17 @@ public class CashService {
                 ? "Пополнение счёта на сумму " + amount + " руб."
                 : "Снятие со счёта на сумму " + amount + " руб.";
 
-        restClient.post()
-                .uri(notificationsServiceUrl + "/api/notifications")
-                .body(new NotificationRequest(login, message))
-                .retrieve()
-                .toBodilessEntity();
+        String kafkaAction = action.equals("PUT") ? "DEPOSIT" : "WITHDRAW";
+
+        NotificationMessage notification = NotificationMessage.builder()
+                .accountId(login)
+                .action(kafkaAction)
+                .amount(amount)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        notificationProducer.sendNotification(notification);
     }
 
     public void processCashFallback(String login, BigDecimal amount, String action, Throwable t) {
