@@ -13,6 +13,9 @@ dependencies:
     version: 0.1.0
     repository: "file://charts/keycloak"
     condition: keycloak.enabled
+  - name: kafka
+    version: 0.1.0
+    repository: "file://charts/kafka"
   - name: accounts-service
     version: 0.1.0
     repository: "file://charts/accounts-service"
