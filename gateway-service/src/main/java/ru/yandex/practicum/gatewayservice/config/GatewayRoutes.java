@@ -20,8 +20,7 @@ public class GatewayRoutes {
     private String cashServiceUrl;
     @Value("${services.transfer-url:http://transfer-service:8083}")
     private String transferServiceUrl;
-    @Value("${services.notifications-url:http://notifications-service:8084}")
-    private String notificationsServiceUrl;
+
 
     @Bean
     public RouterFunction<ServerResponse> accountsRoute() {
@@ -47,11 +46,4 @@ public class GatewayRoutes {
                 .build();
     }
 
-    @Bean
-    public RouterFunction<ServerResponse> notificationsRoute() {
-        return route("notifications-route")
-                .route(path("/api/notifications/**"), http(notificationsServiceUrl))
-                .filter(tokenRelay())
-                .build();
-    }
 }

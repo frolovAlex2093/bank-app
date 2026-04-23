@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
-import ru.yandex.practicum.cashservice.dto.NotificationRequest;
 
 import java.math.BigDecimal;
 
