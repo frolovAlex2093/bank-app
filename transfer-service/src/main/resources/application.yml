@@ -29,3 +29,28 @@ spring:
           issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9090/realms/bank-realm}
           jwk-set-uri: ${OAUTH2_JWK_SET_URI:http://localhost:9090/realms/bank-realm/protocol/openid-connect/certs}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0 # 100% трейсов (только для dev)
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
+
+logstash:
+  url: ${LOGSTASH_URL:logstash:50000}
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
