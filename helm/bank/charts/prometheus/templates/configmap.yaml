@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 10s
+      evaluation_interval: 10s 
+
+    rule_files:
+      - "/etc/prometheus/alerts.rules" 
+
+    scrape_configs:
+      - job_name: 'spring-actuator'
+        metrics_path: '/actuator/prometheus'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: .*-service|bank-front-ui
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+
+  alerts.rules: |
+    groups:
+      - name: BankBusinessAlerts
+        rules:
+          # Алерт 1: Ошибки переводов
+          - alert: HighTransferFailureRate
+            expr: rate(bank_transfer_failed_total[5m]) > 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Обнаружены ошибки переводов средств"
+              description: "За последнюю минуту зафиксированы неудачные попытки перевода денег. Проверьте логи transfer-service."
+    
+          # Алерт 2: Ошибки снятия наличных
+          - alert: HighCashWithdrawFailure
+            expr: rate(bank_cash_withdraw_failed_total[5m]) > 0
+            for: 1m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Ошибки снятия наличных"
+              description: "Клиенты сталкиваются с ошибками при попытке снять наличные."
+
+          # Алерт 3: Неотправленные нотификации
+          - alert: NotificationFailures
+            expr: rate(bank_notification_failed_total[5m]) > 0
+            for: 1m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Сбой отправки уведомлений"
+              description: "Не удалось отправить сообщение в Kafka топик bank-notifications."
+
+      - name: SystemAlerts
+        rules:
+          # Алерт 4: Много HTTP 500 ошибок (по всем сервисам)
+          - alert: HighHttp5xxErrorRate
+            expr: sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) by (app) > 1
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Высокий рейт 5xx ошибок в сервисе {{ $labels.app }}"
