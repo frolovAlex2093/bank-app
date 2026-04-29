@@ -1,22 +1,29 @@
 package ru.yandex.practicum.accountsservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.accountsservice.dto.AccountDto;
+import ru.yandex.practicum.accountsservice.dto.NotificationMessage;
 import ru.yandex.practicum.accountsservice.entity.Account;
+import ru.yandex.practicum.accountsservice.kafka.NotificationProducer;
 import ru.yandex.practicum.accountsservice.repository.AccountRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
 public class AccountController {
+
     private final AccountRepository repository;
+    private final NotificationProducer notificationProducer;
 
     @GetMapping("/me")
     public ResponseEntity<Account> getMyAccount(JwtAuthenticationToken auth) {
@@ -34,7 +41,20 @@ public class AccountController {
             existing.setFirstName(updatedAccount.getFirstName());
             existing.setLastName(updatedAccount.getLastName());
             existing.setBirthDate(updatedAccount.getBirthDate());
-            return ResponseEntity.ok(repository.save(existing));
+
+            Account savedAccount = repository.save(existing);
+
+            NotificationMessage notification = NotificationMessage.builder()
+                    .accountId(login)
+                    .action("PROFILE_UPDATE")
+                    .amount(null)
+                    .message("Ваши данные были успешно изменены")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+
+            notificationProducer.sendNotification(notification);
+
+            return ResponseEntity.ok(savedAccount);
         }).orElse(ResponseEntity.notFound().build());
     }
 

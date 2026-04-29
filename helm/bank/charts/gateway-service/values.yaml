@@ -20,4 +20,3 @@ services:
   accountsUrl: "http://accounts-service:8081"
   cashUrl: "http://cash-service:8082"
   transferUrl: "http://transfer-service:8083"
-  notificationsUrl: "http://notifications-service:8084"

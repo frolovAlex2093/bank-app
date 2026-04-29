@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import ru.yandex.practicum.transferservice.dto.NotificationRequest;
+import ru.yandex.practicum.transferservice.dto.NotificationMessage;
+import ru.yandex.practicum.transferservice.kafka.NotificationProducer;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -18,12 +20,12 @@ import java.math.BigDecimal;
 public class TransferService {
 
     private final RestClient restClient;
+    private final NotificationProducer notificationProducer;
+
     private static final String ACCOUNTS_SERVICE = "accountsService";
 
     @Value("${services.accounts-url:http://accounts-service:8081}")
     private String accountsServiceUrl;
-    @Value("${services.notifications-url:http://notifications-service:8084}")
-    private String notificationsServiceUrl;
 
     @CircuitBreaker(name = ACCOUNTS_SERVICE, fallbackMethod = "transferFallback")
     @Retry(name = ACCOUNTS_SERVICE)
@@ -73,17 +75,25 @@ public class TransferService {
     }
 
     private void sendNotifications(String fromLogin, String toLogin, int amount) {
-        restClient.post()
-                .uri(notificationsServiceUrl + "/api/notifications")
-                .body(new NotificationRequest(fromLogin, "Перевод " + amount + " руб. пользователю " + toLogin))
-                .retrieve()
-                .toBodilessEntity();
+        BigDecimal amountBD = BigDecimal.valueOf(amount);
 
-        restClient.post()
-                .uri(notificationsServiceUrl + "/api/notifications")
-                .body(new NotificationRequest(toLogin, "Получен перевод " + amount + " руб. от " + fromLogin))
-                .retrieve()
-                .toBodilessEntity();
+        NotificationMessage senderNotification = NotificationMessage.builder()
+                .accountId(fromLogin)
+                .action("TRANSFER_OUT")
+                .amount(amountBD)
+                .message("Перевод " + amount + " руб. пользователю " + toLogin)
+                .timestamp(LocalDateTime.now())
+                .build();
+        notificationProducer.sendNotification(senderNotification);
+
+        NotificationMessage receiverNotification = NotificationMessage.builder()
+                .accountId(toLogin)
+                .action("TRANSFER_IN")
+                .amount(amountBD)
+                .message("Получен перевод " + amount + " руб. от " + fromLogin)
+                .timestamp(LocalDateTime.now())
+                .build();
+        notificationProducer.sendNotification(receiverNotification);
     }
 
     public void transferFallback(String fromLogin, String toLogin, int amount, Throwable t) {
