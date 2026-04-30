@@ -35,3 +35,15 @@ dependencies:
     version: 0.1.0
     repository: "file://charts/bank-front-ui"
     condition: bank-front-ui.enabled
+  - name: zipkin
+    version: 0.1.0
+    repository: "file://charts/zipkin"
+  - name: prometheus
+    version: 0.1.0
+    repository: "file://charts/prometheus"
+  - name: grafana
+    version: 0.1.0
+    repository: "file://charts/grafana"
+  - name: elk
+    version: 0.1.0
+    repository: "file://charts/elk"

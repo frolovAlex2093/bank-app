@@ -5,3 +5,5 @@ metadata:
 data:
   OAUTH2_ISSUER_URI: {{ .Values.oauth2.issuerUri | quote }}
   GATEWAY_BASE_URL: {{ .Values.gateway.baseUrl | quote }}
+  ZIPKIN_URL: "http://zipkin:9411"
+  LOGSTASH_URL: "logstash:50000"

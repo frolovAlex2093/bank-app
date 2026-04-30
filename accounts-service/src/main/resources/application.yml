@@ -10,6 +10,10 @@ spring:
       acks: all
       properties:
         enable.idempotence: true
+    template:
+      observation-enabled: true
+    listener:
+      observation-enabled: true
   application:
     name: accounts-service
   datasource:
@@ -46,4 +50,30 @@ spring:
 
   main:
     allow-bean-definition-overriding: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0 # 100% трейсов (только для dev)
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
+
+logstash:
+  url: ${LOGSTASH_URL:logstash:50000}
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
 

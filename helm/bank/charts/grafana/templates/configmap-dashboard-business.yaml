@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-business
+  labels:
+    app: grafana
+data:
+  business.json: |
+    {
+      "title": "Bank Business Metrics",
+      "panels": [
+        {
+          "type": "stat",
+          "title": "Ошибки Переводов (Total)",
+          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+          "targets": [ { "expr": "sum(bank_transfer_failed_total)", "refId": "A" } ],
+          "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } } }
+        },
+        {
+          "type": "stat",
+          "title": "Ошибки Снятия Наличных (Total)",
+          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+          "targets": [ { "expr": "sum(bank_cash_withdraw_failed_total)", "refId": "A" } ],
+          "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } } }
+        },
+        {
+          "type": "stat",
+          "title": "Сбои Уведомлений (Total)",
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+          "targets": [ { "expr": "sum(bank_notification_failed_total)", "refId": "A" } ],
+          "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } } }
+        },
+        {
+          "type": "timeseries",
+          "title": "Динамика ошибок (Rate 5m)",
+          "gridPos": { "h": 9, "w": 24, "x": 0, "y": 8 },
+          "targets": [
+            { "expr": "sum(rate(bank_transfer_failed_total[5m]))", "legendFormat": "Переводы" },
+            { "expr": "sum(rate(bank_cash_withdraw_failed_total[5m]))", "legendFormat": "Снятие" },
+            { "expr": "sum(rate(bank_notification_failed_total[5m]))", "legendFormat": "Уведомления" }
+          ]
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 38,
+      "time": { "from": "now-1h", "to": "now" }
+    }

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  labels:
+    app: grafana
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources
+            # Монтируем провайдер дашбордов
+            - name: grafana-dashboards-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+            # Монтируем сами дашборды
+            - name: grafana-dashboard-business
+              mountPath: /var/lib/grafana/dashboards/business.json
+              subPath: business.json
+            - name: grafana-dashboard-spring
+              mountPath: /var/lib/grafana/dashboards/jvm.json
+              subPath: jvm.json
+            - name: grafana-dashboard-spring
+              mountPath: /var/lib/grafana/dashboards/springboot.json
+              subPath: springboot.json
+      volumes:
+        - name: grafana-datasources
+          configMap:
+            name: grafana-datasources
+        - name: grafana-dashboards-provider
+          configMap:
+            name: grafana-dashboards-provider
+        - name: grafana-dashboard-business
+          configMap:
+            name: grafana-dashboard-business
+        - name: grafana-dashboard-spring
+          configMap:
+            name: grafana-dashboard-spring

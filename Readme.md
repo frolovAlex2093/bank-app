@@ -164,3 +164,33 @@ helm test bank -n bank-dev
 1.  Создайте в Jenkins новый проект типа **Pipeline**.
 2.  В разделе **Pipeline script from SCM** укажите путь к Git-репозиторию и `Jenkinsfile`.
 3.  Нажмите **Build Now**.
+
+## Мониторинг и Observability
+
+В проект добавлен полный стек Observability:
+1. **Трейсинг (Zipkin):** Интегрирован через Micrometer Tracing. Позволяет отслеживать цепочки вызовов HTTP, Kafka и БД. Доступ к Zipkin внутри кластера: `http://zipkin:9411`.
+2. **Метрики (Prometheus & Grafana):** Метрики собираются Actuator. Настроены кастомные метрики неуспешных операций (`bank.cash.withdraw.failed`, `bank.transfer.failed`, `bank.notification.failed`).
+    - Grafana проброшена на NodePort.
+3. **Логирование (ELK Stack):** Логи всех сервисов форматируются в JSON с помощью `logstash-logback-encoder` и отправляются по TCP (порт 50000) в Logstash, затем в Elasticsearch.
+    - Kibana проброшена на NodePort `30561`.
+    - В логах присутствуют `traceId` и `spanId` для сквозного поиска логов по конкретному запросу.
+
+## Как проверить Observability
+
+1. **Grafana (Дашборды и Метрики):**
+   Перейдите на `http://<MINIKUBE_IP>:30300`.
+   В левом меню выберите `Dashboards`. Дашборды развернуты автоматически (Provisioning):
+    - **Bank Business Metrics** (Бизнес-метрики: ошибки переводов, снятия наличных)
+    - **JVM (Micrometer)** (Метрики памяти, GC, потоков)
+    - **Spring Boot 2.1 System Monitor** (HTTP запросы, ответы, тайминги)
+
+2. **Prometheus (Алерты):**
+   Откройте `http://<MINIKUBE_IP>:9090/alerts`. Алерты настроены как конфигурационный код (`alerts.rules`).
+
+3. **Kibana (Логи ELK):**
+   Перейдите на `http://<MINIKUBE_IP>:30561`.
+   При первом входе: `Stack Management` -> `Data Views` -> `Create data view` -> укажите паттерн `microservices-logs-*`.
+
+4. **Zipkin (Трейсинг):**
+   Пробросьте порт: `kubectl port-forward svc/zipkin 9411:9411 -n bank-dev` и откройте `http://localhost:9411`.
+   Реализован сквозной трейсинг от Gateway до БД и Kafka.
