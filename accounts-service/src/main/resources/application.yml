@@ -10,6 +10,10 @@ spring:
       acks: all
       properties:
         enable.idempotence: true
+    template:
+      observation-enabled: true
+    listener:
+      observation-enabled: true
   application:
     name: accounts-service
   datasource:

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.cashservice.kafka;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,10 +13,19 @@ import ru.yandex.practicum.cashservice.dto.NotificationMessage;
 public class NotificationProducer {
 
     private final KafkaTemplate<String, NotificationMessage> kafkaTemplate;
+    private final MeterRegistry meterRegistry;
     private static final String TOPIC = "bank-notifications";
 
     public void sendNotification(NotificationMessage notification) {
-        kafkaTemplate.send(TOPIC, notification.getAccountId(), notification);
-        log.info("Сообщение отправлено в Kafka топик {}: {}", TOPIC, notification);
+        log.debug("Попытка отправки уведомления в Kafka для: {}", notification.getAccountId());
+        kafkaTemplate.send(TOPIC, notification.getAccountId(), notification)
+                .whenComplete((result, ex) -> {
+                    if (ex == null) {
+                        log.info("Сообщение успешно отправлено в Kafka топик {}: {}", TOPIC, notification);
+                    } else {
+                        log.error("Ошибка отправки уведомления в Kafka для {}: {}", notification.getAccountId(), ex.getMessage());
+                        meterRegistry.counter("bank.notification.failed", "login", notification.getAccountId()).increment();
+                    }
+                });
     }
 }

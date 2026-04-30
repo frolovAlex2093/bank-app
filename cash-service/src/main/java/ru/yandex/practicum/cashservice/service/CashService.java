@@ -2,6 +2,7 @@ package ru.yandex.practicum.cashservice.service;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ public class CashService {
 
     private final RestClient restClient;
     private final NotificationProducer notificationProducer;
+    private final MeterRegistry meterRegistry;
 
     private static final String EXTERNAL_SERVICE = "externalService";
 
@@ -31,16 +33,26 @@ public class CashService {
     @Retry(name = EXTERNAL_SERVICE)
     public void processCash(String login, BigDecimal amount, String action) {
         BigDecimal delta = action.equals("PUT") ? amount : amount.negate();
+        log.info("Начало обработки наличных. Логин: {}, Действие: {}, Сумма: {}", login, action, amount);
 
-        log.info("Обработка наличных для {}: {} {}", login, action, amount);
+        try {
+            restClient.patch()
+                    .uri(accountsServiceUrl + "/api/accounts/{login}/balance?amount={amount}", login, delta)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (req, resp) -> {
+                        log.warn("Отказ в операции для {}. Недостаточно средств или неверный запрос.", login);
+                        throw new IllegalStateException("Недостаточно средств или неверный запрос");
+                    })
+                    .toBodilessEntity();
 
-        restClient.patch()
-                .uri(accountsServiceUrl + "/api/accounts/{login}/balance?amount={amount}", login, delta)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, resp) -> {
-                    throw new IllegalStateException("Недостаточно средств или неверный запрос");
-                })
-                .toBodilessEntity();
+            log.debug("Успешное обновление баланса в accounts-service для {}", login);
+        } catch (Exception e) {
+            if (action.equals("GET")) {
+                meterRegistry.counter("bank.cash.withdraw.failed", "login", login).increment();
+            }
+            log.error("Ошибка при обработке наличных для {}: {}", login, e.getMessage(), e);
+            throw e;
+        }
 
         String message = action.equals("PUT")
                 ? "Пополнение счёта на сумму " + amount + " руб."
@@ -60,7 +72,10 @@ public class CashService {
     }
 
     public void processCashFallback(String login, BigDecimal amount, String action, Throwable t) {
-        log.error("Fallback для CashService. Причина: {}", t.getMessage());
+        if (action.equals("GET")) {
+            meterRegistry.counter("bank.cash.withdraw.failed", "login", login).increment();
+        }
+        log.error("Сработал Fallback для CashService. Логин: {}. Причина: {}", login, t.getMessage());
         throw new RuntimeException("Операция с наличными временно недоступна. " + t.getMessage());
     }
 }
