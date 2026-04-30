@@ -13,6 +13,10 @@ spring:
         spring.json.trusted.packages: "*"
     listener:
       ack-mode: RECORD
+      observation-enabled: true
+    template:
+      observation-enabled: true
+
 
 management:
   endpoints:
