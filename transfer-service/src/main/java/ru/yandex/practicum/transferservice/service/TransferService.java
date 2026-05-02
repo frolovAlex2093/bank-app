@@ -62,7 +62,6 @@ public class TransferService {
 
         } catch (Exception e) {
             log.error("Ошибка перевода: {} -> {}. Запуск компенсации. Причина: {}", fromLogin, toLogin, e.getMessage());
-            meterRegistry.counter("bank.transfer.failed").increment();
             if (!(e instanceof IllegalStateException)) {
                 compensateDebit(fromLogin, amountBD);
             }
