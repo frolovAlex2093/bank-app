@@ -47,9 +47,6 @@ public class CashService {
 
             log.debug("Успешное обновление баланса в accounts-service для {}", login);
         } catch (Exception e) {
-            if (action.equals("GET")) {
-                meterRegistry.counter("bank.cash.withdraw.failed", "login", login).increment();
-            }
             log.error("Ошибка при обработке наличных для {}: {}", login, e.getMessage(), e);
             throw e;
         }
@@ -73,7 +70,7 @@ public class CashService {
 
     public void processCashFallback(String login, BigDecimal amount, String action, Throwable t) {
         if (action.equals("GET")) {
-            meterRegistry.counter("bank.cash.withdraw.failed", "login", login).increment();
+            meterRegistry.counter("bank.cash.withdraw.failed").increment();
         }
         log.error("Сработал Fallback для CashService. Логин: {}. Причина: {}", login, t.getMessage());
         throw new RuntimeException("Операция с наличными временно недоступна. " + t.getMessage());

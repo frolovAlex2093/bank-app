@@ -24,7 +24,7 @@ public class NotificationProducer {
                         log.info("Сообщение успешно отправлено в Kafka топик {}: {}", TOPIC, notification);
                     } else {
                         log.error("Ошибка отправки уведомления в Kafka для {}: {}", notification.getAccountId(), ex.getMessage());
-                        meterRegistry.counter("bank.notification.failed", "login", notification.getAccountId()).increment();
+                        meterRegistry.counter("bank.notification.failed", "action", notification.getAction()).increment();
                     }
                 });
     }

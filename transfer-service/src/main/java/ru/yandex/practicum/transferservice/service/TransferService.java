@@ -62,7 +62,7 @@ public class TransferService {
 
         } catch (Exception e) {
             log.error("Ошибка перевода: {} -> {}. Запуск компенсации. Причина: {}", fromLogin, toLogin, e.getMessage());
-            meterRegistry.counter("bank.transfer.failed", "from", fromLogin, "to", toLogin).increment();
+            meterRegistry.counter("bank.transfer.failed").increment();
             if (!(e instanceof IllegalStateException)) {
                 compensateDebit(fromLogin, amountBD);
             }
@@ -106,7 +106,7 @@ public class TransferService {
 
     public void transferFallback(String fromLogin, String toLogin, int amount, Throwable t) {
         log.error("Fallback перевода: Сервис аккаунтов недоступен. Причина: {}", t.getMessage());
-        meterRegistry.counter("bank.transfer.failed", "from", fromLogin, "to", toLogin).increment();
+        meterRegistry.counter("bank.transfer.failed").increment();
         throw new RuntimeException("Сервис переводов временно недоступен.");
     }
 }
