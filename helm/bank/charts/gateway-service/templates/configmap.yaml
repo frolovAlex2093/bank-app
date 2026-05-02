@@ -8,3 +8,5 @@ data:
   SERVICES_ACCOUNTS_URL: {{ .Values.services.accountsUrl | quote }}
   SERVICES_CASH_URL: {{ .Values.services.cashUrl | quote }}
   SERVICES_TRANSFER_URL: {{ .Values.services.transferUrl | quote }}
+  ZIPKIN_URL: "http://zipkin:9411"
+  LOGSTASH_URL: "logstash:50000"

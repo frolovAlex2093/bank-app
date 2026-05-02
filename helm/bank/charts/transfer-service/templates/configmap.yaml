@@ -6,3 +6,5 @@ data:
   OAUTH2_ISSUER_URI: {{ .Values.oauth2.issuerUri | quote }}
   OAUTH2_JWK_SET_URI: {{ .Values.oauth2.jwkSetUri | quote }}
   SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  ZIPKIN_URL: "http://zipkin:9411"
+  LOGSTASH_URL: "logstash:50000"
