@@ -5,13 +5,23 @@ metadata:
 data:
   logstash.conf: |
     input {
-      tcp {
-        port => 50000
-        codec => json_lines
+      kafka {
+        bootstrap_servers => "kafka:9092"
+        topics => ["app-logs"]
+        codec => json
+        group_id => "logstash-group"
+        auto_offset_reset => "earliest"
       }
     }
     filter {
-      # Можно добавить фильтры по необходимости
+      if [app] {
+        mutate {
+          add_field => { "service_name" => "%{app}" }
+        }
+      }
+      mutate {
+        remove_field => ["@version", "host"]
+      }
     }
     output {
       elasticsearch {
